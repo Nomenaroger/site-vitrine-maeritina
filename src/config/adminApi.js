@@ -6,7 +6,8 @@ export const setAdminToken = token => sessionStorage.setItem(TOKEN_KEY, token)
 export const clearAdminToken = () => sessionStorage.removeItem(TOKEN_KEY)
 
 export async function adminRequest(path, options = {}) {
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
+  const headers = { ...(isFormData ? {} : { 'Content-Type': 'application/json' }), ...(options.headers || {}) }
   const token = getAdminToken()
   if (token) headers.Authorization = `Bearer ${token}`
   const response = await fetch(`${API_BASE}/admin${path}`, { ...options, headers })

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Plus, Pencil, Trash2, X, Search, Package } from 'lucide-react'
 import { adminRequest, getAdminToken } from '../../config/adminApi'
-import { apiRequest } from '../../config/api'
+import { apiRequest, resolveProductImage } from '../../config/api'
 
 const emptyForm = { categorie_id: '', nom: '', description: '', reference_oem: '', prix: '', disponibilite: 'sur_commande', image_url: '' }
 
@@ -10,12 +10,22 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   const [form, setForm] = useState(product ? { ...emptyForm, ...product, categorie_id: String(product.categorie_id), prix: product.prix ?? '' } : emptyForm)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(product?.image_url ? resolveProductImage(product.image_url) : '')
+  useEffect(() => {
+    if (!imageFile) return
+    const previewUrl = URL.createObjectURL(imageFile)
+    setImagePreview(previewUrl)
+    return () => URL.revokeObjectURL(previewUrl)
+  }, [imageFile])
   const change = e => setForm(current => ({ ...current, [e.target.name]: e.target.value }))
   async function submit(e) {
     e.preventDefault(); setError(''); setSaving(true)
     try {
-      const body = { ...form, categorie_id: Number(form.categorie_id), prix: form.prix === '' ? null : Number(form.prix) }
-      await adminRequest(product ? `/products/${product.id}` : '/products', { method: product ? 'PUT' : 'POST', body: JSON.stringify(body) })
+      const body = new FormData()
+      Object.entries({ ...form, categorie_id: Number(form.categorie_id), prix: form.prix === '' ? '' : Number(form.prix) }).forEach(([key, value]) => body.append(key, value ?? ''))
+      if (imageFile) body.append('image', imageFile)
+      await adminRequest(product ? `/products/${product.id}` : '/products', { method: product ? 'PUT' : 'POST', body })
       onSaved()
     } catch (err) { setError(err.message) } finally { setSaving(false) }
   }
@@ -28,7 +38,8 @@ function ProductModal({ product, categories, onClose, onSaved }) {
         <label>Référence OEM<input name="reference_oem" value={form.reference_oem || ''} onChange={change}/></label>
         <label>Prix (Ar)<input type="number" min="0" step="0.01" name="prix" value={form.prix} onChange={change} placeholder="Laisser vide si prix sur demande"/></label>
         <label>Disponibilité<select name="disponibilite" value={form.disponibilite} onChange={change}><option value="disponible">Disponible</option><option value="sur_commande">Sur commande</option><option value="indisponible">Indisponible</option></select></label>
-        <label className="full">Adresse de l'image (URL)<input name="image_url" value={form.image_url || ''} onChange={change} maxLength="500" placeholder="https://..."/></label>
+        <label className="full">Image du produit<input type="file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" onChange={e=>setImageFile(e.target.files?.[0] || null)}/><small>Formats acceptés : JPG, PNG, WEBP ou GIF (5 Mo maximum).</small></label>
+        {imagePreview && <div className="admin-product-image-preview full"><img src={imagePreview} alt="Aperçu du produit"/><span>{imageFile ? imageFile.name : 'Image actuelle'}</span></div>}
         <label className="full">Description<textarea name="description" value={form.description || ''} onChange={change} rows="4"/></label>
       </div>
       {error && <div className="admin-alert error">{error}</div>}

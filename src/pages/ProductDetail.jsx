@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, MessageCircle } from 'lucide-react'
 import SectionTitle from '../components/SectionTitle'
-import { apiRequest } from '../config/api'
+import { apiRequest, resolveProductImage } from '../config/api'
 import { buildWhatsAppUrl } from '../config/urlConfig'
 
 export default function ProductDetail() {
@@ -31,7 +31,7 @@ export default function ProductDetail() {
   return <section className="section product-detail-section"><div className="container">
     <Link className="text-link" to="/services"><ArrowLeft size={16}/> Retour au catalogue</Link>
     <div className="product-detail-grid">
-      <div className="product-detail-image">{product.image_url ? <img src={product.image_url} alt={product.nom}/> : <span>MAERITINA</span>}</div>
+      <div className="product-detail-image">{product.image_url ? <img src={resolveProductImage(product.image_url)} alt={product.nom}/> : <span>MAERITINA</span>}</div>
       <div className="product-detail-copy">
         <span className="eyebrow">{product.categorie_nom || 'PIÈCE AUTOMOBILE'}</span>
         <h1>{product.nom}</h1>

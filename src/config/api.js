@@ -9,3 +9,10 @@ export async function apiRequest(path, options = {}) {
   if (!response.ok) throw new Error(payload.message || 'Une erreur est survenue lors de la communication avec le serveur.')
   return payload
 }
+
+export function resolveProductImage(imagePath) {
+  if (!imagePath) return ''
+  if (/^(https?:)?\/\//i.test(imagePath) || imagePath.startsWith('data:')) return imagePath
+  const serverBase = API_BASE_URL.replace(/\/api\/?$/, '')
+  return `${serverBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`
+}

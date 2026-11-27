@@ -2214,3 +2214,36 @@ img {
     padding: 27px 22px;
   }
 }
+
+/* Aperçu et vignette des images de produits — conserve le style du back-office */
+.admin-product-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #667582;
+  font-size: 11px;
+}
+.admin-product-image-preview img {
+  width: 88px;
+  height: 72px;
+  object-fit: contain;
+  border: 1px solid #dce2e7;
+  border-radius: 3px;
+  background: #f7f9fa;
+}
+.admin-product-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.admin-product-name img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border: 1px solid #e4e9ed;
+  border-radius: 3px;
+  background: #fff;
+}
+.admin-form-grid .admin-product-image-preview {
+  grid-column: 1 / -1;
+}

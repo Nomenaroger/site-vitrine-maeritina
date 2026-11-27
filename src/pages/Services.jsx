@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Search, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SectionTitle from '../components/SectionTitle'
-import { apiRequest } from '../config/api'
+import { apiRequest, resolveProductImage } from '../config/api'
 
 export default function Services() {
   const [products, setProducts] = useState([])
@@ -102,7 +102,7 @@ export default function Services() {
             {visible.map((p) => (
               <article className="product-card chamfer-card-sm" key={p.id}>
                 <div className="product-card-image">
-                  {p.image_url ? <img src={p.image_url} alt={p.nom} /> : <span>MAERITINA</span>}
+                  {p.image_url ? <img src={resolveProductImage(p.image_url)} alt={p.nom} /> : <span>MAERITINA</span>}
                 </div>
                 <div className="product-card-content">
                   <span>{p.categorie_nom || 'Pièce automobile'}</span>

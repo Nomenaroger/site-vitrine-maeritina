@@ -146,6 +146,7 @@ export async function createProduct(req, res, next) {
     const [category] = await db.query('SELECT id FROM categories WHERE id = ? AND actif = 1', [validated.value.categorie_id])
     if (!category.length) return res.status(400).json({ message: 'Catégorie introuvable.' })
     const p = validated.value
+    if (req.file) p.image_url = req.file.path
     const [result] = await db.query(
       `INSERT INTO produits (categorie_id, nom, description, reference_oem, prix, disponibilite, image_url)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -162,6 +163,7 @@ export async function updateProduct(req, res, next) {
     const validated = validateProduct(req.body)
     if (validated.error) return res.status(400).json({ message: validated.error })
     const p = validated.value
+    if (req.file) p.image_url = req.file.path
     const [category] = await db.query('SELECT id FROM categories WHERE id = ? AND actif = 1', [p.categorie_id])
     if (!category.length) return res.status(400).json({ message: 'Catégorie introuvable.' })
     const [result] = await db.query(
